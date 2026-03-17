@@ -1,0 +1,60 @@
+# ============================================================
+# docker-compose.prod.yml — Producción (Dokploy / VPS)
+# Uso: docker-compose -f docker-compose.prod.yml up -d
+#
+# El frontend (nginx) hace proxy de /api/ al backend.
+# VITE_API_URL debe ser /api/v1 (relativo) en producción.
+# ============================================================
+version: '3.8'
+
+services:
+
+  # ── Backend FastAPI ──────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: dmcars-backend
+    env_file:
+      - .env
+    environment:
+      APP_ENV: production
+      DEBUG: "false"
+    volumes:
+      # Certificados ARCA (montar desde servidor, nunca en imagen)
+      - ./certs:/app/app/certs:ro
+    expose:
+      - "8000"           # Solo visible internamente (nginx hace proxy)
+    networks:
+      - dmcars-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # ── Frontend React (nginx) ───────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: production          # Stage de producción (nginx)
+      args:
+        VITE_API_URL: /api/v1     # Relativo — nginx hace proxy a backend
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
+        VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY}
+    container_name: dmcars-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - dmcars-network
+    restart: unless-stopped
+
+networks:
+  dmcars-network:
+    driver: bridge

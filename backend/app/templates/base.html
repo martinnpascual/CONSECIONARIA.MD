@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<title>{% block title %}Documento{% endblock %} — DM Cars</title>
+<style>
+  /* ─── Reset ─── */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  /* ─── Página ─── */
+  @page {
+    size: A4;
+    margin: 15mm 15mm 20mm 15mm;
+    @bottom-center {
+      content: "Página " counter(page) " de " counter(pages);
+      font-family: Arial, sans-serif;
+      font-size: 8pt;
+      color: #666;
+    }
+  }
+
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9pt;
+    color: #1a1a1a;
+    line-height: 1.4;
+  }
+
+  /* ─── Header / Membrete ─── */
+  .header {
+    border-bottom: 3px solid #1e40af;
+    padding-bottom: 10px;
+    margin-bottom: 16px;
+  }
+  .header-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .header-table td { vertical-align: top; }
+  .company-name {
+    font-size: 22pt;
+    font-weight: bold;
+    color: #1e40af;
+    letter-spacing: -0.5px;
+  }
+  .company-tagline {
+    font-size: 9pt;
+    color: #666;
+    margin-top: 2px;
+  }
+  .company-info {
+    font-size: 8pt;
+    color: #444;
+    line-height: 1.6;
+    text-align: right;
+  }
+
+  /* ─── Título del documento ─── */
+  .doc-title-box {
+    background-color: #1e40af;
+    color: white;
+    text-align: center;
+    padding: 7px 0;
+    margin-bottom: 16px;
+  }
+  .doc-title-box .doc-title {
+    font-size: 14pt;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .doc-title-box .doc-subtitle {
+    font-size: 8pt;
+    opacity: 0.85;
+    margin-top: 2px;
+  }
+
+  /* ─── Tablas de datos ─── */
+  table.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 12px;
+  }
+  table.data-table th {
+    background-color: #eff6ff;
+    color: #1e40af;
+    font-size: 8pt;
+    font-weight: bold;
+    text-align: left;
+    padding: 5px 8px;
+    border: 1px solid #bfdbfe;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  table.data-table td {
+    padding: 5px 8px;
+    border: 1px solid #e5e7eb;
+    font-size: 8.5pt;
+    vertical-align: top;
+  }
+  table.data-table tr:nth-child(even) td {
+    background-color: #f9fafb;
+  }
+
+  /* ─── Secciones ─── */
+  .section {
+    margin-bottom: 14px;
+  }
+  .section-title {
+    font-size: 9.5pt;
+    font-weight: bold;
+    color: #1e40af;
+    border-bottom: 1.5px solid #bfdbfe;
+    padding-bottom: 3px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  /* ─── Grilla de 2 columnas ─── */
+  .two-col {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 12px;
+  }
+  .two-col td {
+    width: 50%;
+    vertical-align: top;
+    padding: 0 6px 0 0;
+  }
+  .two-col td:last-child { padding-right: 0; }
+
+  .field-label {
+    font-size: 7.5pt;
+    color: #6b7280;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 0.3px;
+    margin-bottom: 1px;
+  }
+  .field-value {
+    font-size: 9pt;
+    color: #111;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 2px;
+    margin-bottom: 8px;
+  }
+
+  /* ─── Totales / Resaltados ─── */
+  .total-box {
+    background-color: #eff6ff;
+    border: 1.5px solid #1e40af;
+    padding: 10px 14px;
+    text-align: right;
+    margin-bottom: 14px;
+  }
+  .total-label { font-size: 9pt; color: #444; }
+  .total-value { font-size: 14pt; font-weight: bold; color: #1e40af; }
+
+  .highlight-box {
+    background-color: #fefce8;
+    border: 1px solid #fde68a;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    font-size: 8.5pt;
+  }
+
+  /* ─── Firma ─── */
+  .signature-section {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 30px;
+  }
+  .signature-section td {
+    text-align: center;
+    width: 33%;
+    padding: 40px 10px 5px;
+    border-top: 1px solid #374151;
+    font-size: 8pt;
+    color: #444;
+    vertical-align: top;
+  }
+  .signature-name {
+    font-weight: bold;
+    font-size: 9pt;
+    color: #111;
+    margin-bottom: 2px;
+  }
+
+  /* ─── Footer ─── */
+  .doc-footer {
+    margin-top: 20px;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 6px;
+    font-size: 7pt;
+    color: #9ca3af;
+    text-align: center;
+  }
+
+  /* ─── Badges de estado ─── */
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 7.5pt;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  .badge-blue { background: #dbeafe; color: #1d4ed8; }
+  .badge-green { background: #dcfce7; color: #166534; }
+  .badge-yellow { background: #fef9c3; color: #854d0e; }
+
+  /* ─── Número de documento ─── */
+  .doc-number-box {
+    border: 1.5px solid #1e40af;
+    padding: 6px 14px;
+    display: inline-block;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  .doc-number-label { font-size: 7.5pt; color: #6b7280; text-transform: uppercase; }
+  .doc-number { font-size: 13pt; font-weight: bold; color: #1e40af; }
+
+  .page-break { page-break-before: always; }
+  .no-break { page-break-inside: avoid; }
+</style>
+</head>
+<body>
+
+<!-- MEMBRETE -->
+<div class="header">
+  <table class="header-table">
+    <tr>
+      <td style="width:60%">
+        <div class="company-name">DM Cars</div>
+        <div class="company-tagline">{{ business.tagline or 'Concesionaria Dante Mostajo' }}</div>
+      </td>
+      <td style="width:40%">
+        <div class="company-info">
+          <strong>{{ business.legal_name or 'DM Cars' }}</strong><br/>
+          CUIT: {{ business.cuit or '' }}<br/>
+          {{ business.address or '' }}<br/>
+          Tel: {{ business.phone or '' }}<br/>
+          {{ business.email or '' }}
+        </div>
+      </td>
+    </tr>
+  </table>
+</div>
+
+{% block content %}{% endblock %}
+
+<!-- FOOTER -->
+<div class="doc-footer">
+  Documento generado el {{ generated_at }} — DM Cars, {{ business.address or '' }}
+  — Este documento es de carácter informativo.
+</div>
+
+</body>
+</html>

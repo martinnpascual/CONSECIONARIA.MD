@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Contrato de Consignación {{ consignment.consignment_number }}{% endblock %}
+
+{% block content %}
+<div class="doc-title-box">
+  <div class="doc-title">Contrato de Consignación</div>
+  <div class="doc-subtitle">Mandato de venta de vehículo automotor</div>
+</div>
+
+<div class="doc-number-box" style="margin-bottom:16px;">
+  <div class="doc-number-label">Contrato N°</div>
+  <div class="doc-number">{{ consignment.consignment_number }}</div>
+</div>
+
+<p style="font-size:9pt; text-align:justify; margin-bottom:14px;">
+  En la ciudad de {{ business.city or '...' }}, el día <strong>{{ consignment.start_date }}</strong>,
+  se celebra el presente contrato de consignación entre:
+</p>
+
+<div class="section">
+  <div class="section-title">Partes del Contrato</div>
+  <table class="data-table">
+    <tr>
+      <th style="width:25%">Rol</th>
+      <th style="width:37%">Consignante (Propietario)</th>
+      <th>Consignatario (Concesionaria)</th>
+    </tr>
+    <tr>
+      <td><strong>Nombre</strong></td>
+      <td>{{ owner.full_name }}</td>
+      <td>{{ business.legal_name or 'DM Cars' }}</td>
+    </tr>
+    <tr>
+      <td><strong>DNI / CUIT</strong></td>
+      <td>DNI: {{ owner.dni or '—' }}</td>
+      <td>CUIT: {{ business.cuit or '—' }}</td>
+    </tr>
+    <tr>
+      <td><strong>Domicilio</strong></td>
+      <td>{{ owner.address or '—' }}</td>
+      <td>{{ business.address or '—' }}</td>
+    </tr>
+    <tr>
+      <td><strong>Teléfono</strong></td>
+      <td>{{ owner.phone or '—' }}</td>
+      <td>{{ business.phone or '—' }}</td>
+    </tr>
+  </table>
+</div>
+
+<div class="section">
+  <div class="section-title">Vehículo en Consignación</div>
+  <table class="data-table">
+    <tr>
+      <td style="width:50%"><strong>Marca / Modelo:</strong> {{ vehicle.brand }} {{ vehicle.model }}</td>
+      <td><strong>Versión:</strong> {{ vehicle.version or '—' }}</td>
+    </tr>
+    <tr>
+      <td><strong>Año:</strong> {{ vehicle.year }}</td>
+      <td><strong>Color:</strong> {{ vehicle.color or '—' }}</td>
+    </tr>
+    <tr>
+      <td><strong>Patente / Dominio:</strong> {{ vehicle.plate or '—' }}</td>
+      <td><strong>Chasis N°:</strong> {{ vehicle.vin or '—' }}</td>
+    </tr>
+    <tr>
+      <td><strong>Motor N°:</strong> {{ vehicle.engine_number or '—' }}</td>
+      <td><strong>Km:</strong> {{ '{:,.0f}'.format(vehicle.mileage) if vehicle.mileage else '—' }}</td>
+    </tr>
+  </table>
+</div>
+
+<div class="section">
+  <div class="section-title">Términos Económicos</div>
+  <table class="data-table">
+    <tr>
+      <td style="width:60%">Precio mínimo acordado (piso del propietario)</td>
+      <td style="text-align:right"><strong>$ {{ '{:,.0f}'.format(consignment.owner_floor_price) }}</strong></td>
+    </tr>
+    <tr>
+      <td>Precio de oferta en el mercado</td>
+      <td style="text-align:right">$ {{ '{:,.0f}'.format(vehicle.asking_price) if vehicle.asking_price else '—' }}</td>
+    </tr>
+    <tr>
+      <td>
+        Comisión de la concesionaria
+        {% if consignment.commission_type == 'porcentaje' %} ({{ consignment.commission_value }}% del precio de venta)
+        {% else %} (monto fijo){% endif %}
+      </td>
+      <td style="text-align:right">
+        {% if consignment.commission_type == 'porcentaje' %}
+          {{ consignment.commission_value }}%
+        {% else %}
+          $ {{ '{:,.0f}'.format(consignment.commission_value) }}
+        {% endif %}
+      </td>
+    </tr>
+    {% if consignment.end_date %}
+    <tr>
+      <td>Vigencia del contrato</td>
+      <td style="text-align:right">Hasta el {{ consignment.end_date }}</td>
+    </tr>
+    {% endif %}
+  </table>
+</div>
+
+<div class="section no-break">
+  <div class="section-title">Cláusulas</div>
+  <p style="font-size:8pt; line-height:1.7; text-align:justify;">
+  <strong>PRIMERA — OBJETO:</strong> El CONSIGNANTE entrega al CONSIGNATARIO el vehículo descripto para su exposición y venta, manteniendo el CONSIGNANTE la titularidad del bien hasta la efectiva transferencia.<br/>
+  <strong>SEGUNDA — PRECIO:</strong> El CONSIGNATARIO queda autorizado a vender el vehículo por cualquier valor igual o superior al precio piso indicado. La diferencia entre el precio de venta y el precio piso, más la comisión pactada, corresponde al CONSIGNATARIO.<br/>
+  <strong>TERCERA — COMISIÓN:</strong> Por su gestión el CONSIGNATARIO percibirá la comisión indicada en la tabla precedente, descontada de la liquidación final al propietario.<br/>
+  <strong>CUARTA — LIQUIDACIÓN:</strong> Concretada la venta, el CONSIGNATARIO liquidará al CONSIGNANTE el importe correspondiente dentro de los 5 días hábiles siguientes al cobro total del precio por parte del comprador.<br/>
+  <strong>QUINTA — CUSTODIA:</strong> El CONSIGNATARIO se compromete a conservar el vehículo en buen estado durante el período de consignación, siendo responsable de los daños causados por su negligencia.<br/>
+  <strong>SEXTA — RETIRO:</strong> El CONSIGNANTE podrá retirar el vehículo en cualquier momento previo aviso de 48 hs., siempre que no exista operación en curso.<br/>
+  <strong>SÉPTIMA — DOCUMENTACIÓN:</strong> El CONSIGNANTE entrega al CONSIGNATARIO la documentación necesaria para realizar las gestiones de venta y transferencia.<br/>
+  <strong>OCTAVA — JURISDICCIÓN:</strong> Las partes se someten a los Tribunales Ordinarios del domicilio del CONSIGNATARIO para dirimir cualquier controversia.
+  </p>
+</div>
+
+{% if consignment.notes %}
+<div class="highlight-box no-break">
+  <strong>Observaciones:</strong> {{ consignment.notes }}
+</div>
+{% endif %}
+
+<table class="signature-section no-break">
+  <tr>
+    <td>
+      <div class="signature-name">{{ owner.full_name }}</div>
+      DNI: {{ owner.dni or '—' }}<br/>Consignante — Propietario
+    </td>
+    <td></td>
+    <td>
+      <div class="signature-name">{{ business.legal_name or 'DM Cars' }}</div>
+      CUIT: {{ business.cuit or '—' }}<br/>Consignatario
+    </td>
+  </tr>
+</table>
+{% endblock %}

@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Cotización {{ sale.sale_number }}{% endblock %}
+
+{% block content %}
+<div class="doc-title-box">
+  <div class="doc-title">Cotización de Vehículo</div>
+  <div class="doc-subtitle">Válida por 5 días hábiles a partir de la fecha de emisión</div>
+</div>
+
+<!-- Número y fecha -->
+<table style="width:100%; border-collapse:collapse; margin-bottom:14px;">
+  <tr>
+    <td style="width:50%">
+      <div class="doc-number-box">
+        <div class="doc-number-label">N° de Cotización</div>
+        <div class="doc-number">{{ sale.sale_number }}</div>
+      </div>
+    </td>
+    <td style="width:50%; text-align:right; vertical-align:top;">
+      <div class="field-label">Fecha</div>
+      <div class="field-value">{{ sale.sale_date }}</div>
+      <div class="field-label">Vendedor</div>
+      <div class="field-value">{{ sale.seller_name or '—' }}</div>
+    </td>
+  </tr>
+</table>
+
+<!-- Datos del cliente -->
+<div class="section">
+  <div class="section-title">Datos del Cliente</div>
+  <table class="two-col">
+    <tr>
+      <td>
+        <div class="field-label">Nombre / Razón Social</div>
+        <div class="field-value">{{ client.full_name }}</div>
+        <div class="field-label">DNI / CUIT</div>
+        <div class="field-value">{{ client.dni or '—' }}</div>
+      </td>
+      <td>
+        <div class="field-label">Teléfono</div>
+        <div class="field-value">{{ client.phone or '—' }}</div>
+        <div class="field-label">Email</div>
+        <div class="field-value">{{ client.email or '—' }}</div>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <div class="field-label">Domicilio</div>
+        <div class="field-value">{{ client.address or '—' }}</div>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- Datos del vehículo -->
+<div class="section">
+  <div class="section-title">Vehículo Cotizado</div>
+  <table class="data-table">
+    <tr>
+      <th style="width:25%">Campo</th>
+      <th>Descripción</th>
+    </tr>
+    <tr><td><strong>Marca / Modelo</strong></td><td>{{ vehicle.brand }} {{ vehicle.model }}</td></tr>
+    <tr><td><strong>Versión</strong></td><td>{{ vehicle.version or '—' }}</td></tr>
+    <tr><td><strong>Año</strong></td><td>{{ vehicle.year }}</td></tr>
+    <tr><td><strong>Tipo</strong></td><td>{{ vehicle.vehicle_type | capitalize }}</td></tr>
+    <tr><td><strong>Color</strong></td><td>{{ vehicle.color or '—' }}</td></tr>
+    <tr><td><strong>Km</strong></td><td>{{ '{:,.0f}'.format(vehicle.mileage) if vehicle.mileage else '0 (nuevo)' }}</td></tr>
+    <tr><td><strong>Patente</strong></td><td>{{ vehicle.plate or 'A asignar' }}</td></tr>
+    <tr><td><strong>Motor</strong></td><td>{{ vehicle.engine or '—' }}</td></tr>
+    <tr><td><strong>Transmisión</strong></td><td>{{ vehicle.transmission or '—' }}</td></tr>
+  </table>
+</div>
+
+<!-- Condiciones económicas -->
+<div class="section">
+  <div class="section-title">Condiciones Económicas</div>
+  <table class="data-table">
+    <tr>
+      <th>Concepto</th>
+      <th style="text-align:right; width:30%">Importe</th>
+    </tr>
+    <tr>
+      <td>Precio de lista del vehículo</td>
+      <td style="text-align:right">$ {{ '{:,.0f}'.format(sale.asking_price) }}</td>
+    </tr>
+    {% if sale.trade_in_value %}
+    <tr>
+      <td>Toma de usado ({{ sale.trade_in_description or 'Vehículo en parte de pago' }})</td>
+      <td style="text-align:right; color:#166534;">− $ {{ '{:,.0f}'.format(sale.trade_in_value) }}</td>
+    </tr>
+    {% endif %}
+    {% if sale.discount %}
+    <tr>
+      <td>Descuento aplicado</td>
+      <td style="text-align:right; color:#166534;">− $ {{ '{:,.0f}'.format(sale.discount) }}</td>
+    </tr>
+    {% endif %}
+    <tr>
+      <td><strong>Precio de venta acordado</strong></td>
+      <td style="text-align:right"><strong>$ {{ '{:,.0f}'.format(sale.final_price) }}</strong></td>
+    </tr>
+    {% if sale.down_payment %}
+    <tr>
+      <td>Señal / Entrega inicial</td>
+      <td style="text-align:right">$ {{ '{:,.0f}'.format(sale.down_payment) }}</td>
+    </tr>
+    {% endif %}
+  </table>
+</div>
+
+<!-- Financiamiento -->
+{% if sale.financing %}
+<div class="section">
+  <div class="section-title">Plan de Financiamiento</div>
+  <div class="highlight-box">
+    <strong>Sistema Francés — Cuota Fija</strong><br/>
+    Capital financiado: $ {{ '{:,.0f}'.format(sale.financing.financed_amount) }} |
+    Cuotas: {{ sale.financing.installments }} × $ {{ '{:,.0f}'.format(sale.financing.installment_amount) }} |
+    TNA: {{ sale.financing.annual_rate }}% |
+    TEA: {{ '{:.2f}'.format(sale.financing.effective_annual_rate) }}%<br/>
+    <small>Total a pagar: $ {{ '{:,.0f}'.format(sale.financing.total_amount) }}</small>
+  </div>
+</div>
+{% endif %}
+
+<!-- Total -->
+<div class="total-box no-break">
+  <div class="total-label">PRECIO TOTAL DE VENTA</div>
+  <div class="total-value">$ {{ '{:,.0f}'.format(sale.final_price) }}</div>
+  <div style="font-size:7.5pt; color:#6b7280; margin-top:4px;">Precios expresados en pesos argentinos (ARS)</div>
+</div>
+
+<!-- Condiciones generales -->
+{% if sale.notes %}
+<div class="section">
+  <div class="section-title">Observaciones</div>
+  <p style="font-size:8.5pt">{{ sale.notes }}</p>
+</div>
+{% endif %}
+
+<div class="highlight-box no-break">
+  <strong>Condiciones:</strong> Esta cotización es válida por 5 días hábiles a partir de la fecha indicada.
+  Los precios están sujetos a disponibilidad de stock. Para confirmar la operación se requiere el pago de una seña.
+</div>
+
+<!-- Firmas -->
+<table class="signature-section no-break">
+  <tr>
+    <td>
+      <div class="signature-name">{{ client.full_name }}</div>
+      DNI: {{ client.dni or '—' }}<br/>Cliente
+    </td>
+    <td></td>
+    <td>
+      <div class="signature-name">{{ sale.seller_name or 'Vendedor' }}</div>
+      DM Cars
+    </td>
+  </tr>
+</table>
+{% endblock %}

@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Acta de Entrega — {{ sale.sale_number }}{% endblock %}
+
+{% block content %}
+<div class="doc-title-box">
+  <div class="doc-title">Acta de Entrega de Vehículo</div>
+  <div class="doc-subtitle">{{ sale.sale_date }}</div>
+</div>
+
+<div class="doc-number-box" style="margin-bottom:16px;">
+  <div class="doc-number-label">Operación N°</div>
+  <div class="doc-number">{{ sale.sale_number }}</div>
+</div>
+
+<p style="font-size:9pt; text-align:justify; margin-bottom:14px;">
+  En la ciudad de {{ business.city or business.address or '...' }}, el día <strong>{{ sale.delivery_date or sale.sale_date }}</strong>,
+  <strong>{{ business.legal_name or 'DM Cars' }}</strong> (en adelante el VENDEDOR) hace entrega al Sr./a
+  <strong>{{ client.full_name }}</strong>, DNI <strong>{{ client.dni or '—' }}</strong> (en adelante el COMPRADOR),
+  del siguiente vehículo:
+</p>
+
+<div class="section">
+  <div class="section-title">Vehículo Entregado</div>
+  <table class="data-table">
+    <tr>
+      <td style="width:50%"><strong>Marca / Modelo:</strong> {{ vehicle.brand }} {{ vehicle.model }}</td>
+      <td><strong>Versión:</strong> {{ vehicle.version or '—' }}</td>
+    </tr>
+    <tr>
+      <td><strong>Año:</strong> {{ vehicle.year }}</td>
+      <td><strong>Color:</strong> {{ vehicle.color or '—' }}</td>
+    </tr>
+    <tr>
+      <td><strong>Patente / Dominio:</strong> {{ vehicle.plate or 'A asignar' }}</td>
+      <td><strong>Chasis N°:</strong> {{ vehicle.vin or '—' }}</td>
+    </tr>
+    <tr>
+      <td><strong>Motor N°:</strong> {{ vehicle.engine_number or '—' }}</td>
+      <td><strong>Km al momento de entrega:</strong> {{ '{:,.0f}'.format(vehicle.mileage) if vehicle.mileage else '—' }}</td>
+    </tr>
+  </table>
+</div>
+
+<div class="section">
+  <div class="section-title">Accesorios y Documentación Entregada</div>
+  <table class="data-table">
+    <tr>
+      <th>Ítem</th>
+      <th style="text-align:center; width:15%">Entregado</th>
+      <th>Observaciones</th>
+    </tr>
+    <tr>
+      <td>Título del vehículo</td>
+      <td style="text-align:center">{{ '✓' if delivery.title else '—' }}</td>
+      <td>{{ delivery.title_notes or '' }}</td>
+    </tr>
+    <tr>
+      <td>Manual del usuario</td>
+      <td style="text-align:center">{{ '✓' if delivery.manual else '—' }}</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Llave de repuesto</td>
+      <td style="text-align:center">{{ '✓' if delivery.spare_key else '—' }}</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Gato y rueda de auxilio</td>
+      <td style="text-align:center">{{ '✓' if delivery.spare_tire else '—' }}</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Libro de service</td>
+      <td style="text-align:center">{{ '✓' if delivery.service_book else '—' }}</td>
+      <td></td>
+    </tr>
+    {% if delivery.extras %}
+    <tr>
+      <td colspan="3"><em>Extras: {{ delivery.extras }}</em></td>
+    </tr>
+    {% endif %}
+  </table>
+</div>
+
+<div class="section">
+  <div class="section-title">Estado del Vehículo al Momento de la Entrega</div>
+  <table class="data-table">
+    <tr>
+      <td style="width:30%"><strong>Estado general:</strong></td>
+      <td>{{ delivery.condition or '—' }}</td>
+    </tr>
+    {% if delivery.observations %}
+    <tr>
+      <td><strong>Observaciones:</strong></td>
+      <td>{{ delivery.observations }}</td>
+    </tr>
+    {% endif %}
+  </table>
+</div>
+
+<div class="section">
+  <div class="section-title">Detalle Financiero Final</div>
+  <table class="data-table">
+    <tr>
+      <td>Precio total acordado</td>
+      <td style="text-align:right">$ {{ '{:,.0f}'.format(sale.final_price) }}</td>
+    </tr>
+    <tr>
+      <td>Total abonado</td>
+      <td style="text-align:right">$ {{ '{:,.0f}'.format(sale.total_paid or 0) }}</td>
+    </tr>
+    <tr>
+      <td><strong>Saldo</strong></td>
+      <td style="text-align:right">
+        <strong>{{ '$ 0' if (sale.balance_due or 0) == 0 else '$ ' ~ '{:,.0f}'.format(sale.balance_due) }}</strong>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<p style="font-size:8.5pt; text-align:justify; margin-bottom:14px;">
+  El COMPRADOR declara haber recibido el vehículo descripto en perfectas condiciones y de conformidad con lo pactado,
+  prestando su conformidad con la presente acta de entrega. Cualquier reclamo posterior deberá realizarse por
+  escrito dentro de las 48 horas de recibida la unidad.
+</p>
+
+<table class="signature-section no-break">
+  <tr>
+    <td>
+      <div class="signature-name">{{ client.full_name }}</div>
+      DNI: {{ client.dni or '—' }}<br/>Comprador — Conforme
+    </td>
+    <td></td>
+    <td>
+      <div class="signature-name">{{ sale.seller_name or 'DM Cars' }}</div>
+      {{ business.legal_name or 'DM Cars' }}<br/>Vendedor
+    </td>
+  </tr>
+</table>
+{% endblock %}

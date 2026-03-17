@@ -1,0 +1,87 @@
+version: '3.8'
+
+# DM Cars — Docker Compose
+# Nota: La base de datos es Supabase (cloud), no se levanta un PostgreSQL local.
+# Este archivo orquesta solo el backend FastAPI y el frontend React.
+# Para desarrollo local, es suficiente con levantar backend + frontend.
+
+services:
+
+  # ── Backend FastAPI ─────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: dmcars-backend
+    env_file:
+      - .env
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      DEBUG: ${DEBUG:-false}
+      PORT: 8000
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      JWT_SECRET: ${JWT_SECRET}
+      MRBOT_EMAIL: ${MRBOT_EMAIL:-}
+      MRBOT_API_KEY: ${MRBOT_API_KEY:-}
+      AFIP_CUIT: ${AFIP_CUIT:-}
+      AFIP_PUNTO_VENTA: ${AFIP_PUNTO_VENTA:-1}
+      AFIP_TESTING: ${AFIP_TESTING:-true}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      # Montar carpeta de certificados AFIP (local, nunca en el repo)
+      - ./certs:/app/app/certs:ro
+    networks:
+      - dmcars-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── Frontend React + Vite ───────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: dmcars-frontend
+    env_file:
+      - .env
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:8000/api/v1}
+      VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
+      VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY}
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - dmcars-network
+    restart: unless-stopped
+    depends_on:
+      - backend
+
+networks:
+  dmcars-network:
+    driver: bridge
+
+# ── Notas ──────────────────────────────────────────────────────
+# Para levantar el entorno completo:
+#   docker-compose up -d
+#
+# Para ver logs:
+#   docker-compose logs -f backend
+#   docker-compose logs -f frontend
+#
+# Para desarrollo local sin Docker:
+#   Backend:  cd backend && uvicorn app.main:app --reload
+#   Frontend: cd frontend && npm run dev
+#
+# Frontend disponible en: http://localhost:5173
+# Backend API en:         http://localhost:8000
+# Documentación API:      http://localhost:8000/docs

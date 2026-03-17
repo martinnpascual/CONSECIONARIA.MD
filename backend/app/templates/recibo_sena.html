@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Recibo de Seña — {{ sale.sale_number }}{% endblock %}
+
+{% block content %}
+<div class="doc-title-box">
+  <div class="doc-title">Recibo de Seña</div>
+  <div class="doc-subtitle">{{ sale.sale_date }}</div>
+</div>
+
+<div class="doc-number-box" style="margin-bottom:16px;">
+  <div class="doc-number-label">Operación N°</div>
+  <div class="doc-number">{{ sale.sale_number }}</div>
+</div>
+
+<div class="section">
+  <div class="section-title">Recibí de</div>
+  <table class="two-col">
+    <tr>
+      <td>
+        <div class="field-label">Nombre</div>
+        <div class="field-value">{{ client.full_name }}</div>
+        <div class="field-label">DNI</div>
+        <div class="field-value">{{ client.dni or '—' }}</div>
+      </td>
+      <td>
+        <div class="field-label">Teléfono</div>
+        <div class="field-value">{{ client.phone or '—' }}</div>
+        <div class="field-label">Email</div>
+        <div class="field-value">{{ client.email or '—' }}</div>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="section">
+  <div class="section-title">La suma de</div>
+  <div class="total-box">
+    <div class="total-label">IMPORTE DE LA SEÑA</div>
+    <div class="total-value">$ {{ '{:,.0f}'.format(payment.amount) }}</div>
+    <div style="font-size:8pt; color:#374151; margin-top:4px;">
+      <em>({{ amount_in_words or '' }})</em>
+    </div>
+  </div>
+  <table class="data-table">
+    <tr>
+      <th>Forma de pago</th>
+      <th>Referencia / N° de operación</th>
+    </tr>
+    <tr>
+      <td>{{ payment.payment_method | capitalize }}</td>
+      <td>{{ payment.reference or '—' }}</td>
+    </tr>
+  </table>
+</div>
+
+<div class="section">
+  <div class="section-title">En concepto de seña por el vehículo</div>
+  <table class="data-table">
+    <tr>
+      <td style="width:50%"><strong>{{ vehicle.brand }} {{ vehicle.model }} {{ vehicle.year }}</strong></td>
+      <td>Versión: {{ vehicle.version or '—' }}</td>
+    </tr>
+    <tr>
+      <td>Patente: {{ vehicle.plate or 'A asignar' }}</td>
+      <td>Color: {{ vehicle.color or '—' }}</td>
+    </tr>
+  </table>
+</div>
+
+<div class="section">
+  <div class="section-title">Resumen de la operación</div>
+  <table class="data-table">
+    <tr>
+      <td>Precio total acordado</td>
+      <td style="text-align:right">$ {{ '{:,.0f}'.format(sale.final_price) }}</td>
+    </tr>
+    <tr>
+      <td>Seña recibida</td>
+      <td style="text-align:right">$ {{ '{:,.0f}'.format(payment.amount) }}</td>
+    </tr>
+    <tr>
+      <td><strong>Saldo pendiente</strong></td>
+      <td style="text-align:right"><strong>$ {{ '{:,.0f}'.format(sale.balance_due or 0) }}</strong></td>
+    </tr>
+  </table>
+</div>
+
+<div class="highlight-box no-break" style="font-size:8pt;">
+  La presente seña confirma la reserva del vehículo detallado. En caso de arrepentimiento del comprador,
+  la seña quedará a favor del vendedor como compensación. En caso de arrepentimiento del vendedor,
+  deberá devolver el doble de la suma entregada.
+</div>
+
+<table class="signature-section no-break">
+  <tr>
+    <td>
+      <div class="signature-name">{{ client.full_name }}</div>
+      DNI: {{ client.dni or '—' }}<br/>Comprador — Conforme
+    </td>
+    <td></td>
+    <td>
+      <div class="signature-name">{{ sale.seller_name or 'DM Cars' }}</div>
+      En representación de {{ business.legal_name or 'DM Cars' }}
+    </td>
+  </tr>
+</table>
+{% endblock %}

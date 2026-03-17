@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}Orden de Trabajo {{ work_order.order_number }}{% endblock %}
+
+{% block content %}
+<div class="doc-title-box">
+  <div class="doc-title">Orden de Trabajo</div>
+  <div class="doc-subtitle">Presupuesto de servicio técnico</div>
+</div>
+
+<table style="width:100%; border-collapse:collapse; margin-bottom:14px;">
+  <tr>
+    <td style="width:50%">
+      <div class="doc-number-box">
+        <div class="doc-number-label">N° de Orden</div>
+        <div class="doc-number">{{ work_order.order_number }}</div>
+      </div>
+    </td>
+    <td style="text-align:right; vertical-align:top;">
+      <div class="field-label">Fecha de ingreso</div>
+      <div class="field-value">{{ work_order.entry_date }}</div>
+      <div class="field-label">Entrega estimada</div>
+      <div class="field-value">{{ work_order.estimated_delivery_date or 'A confirmar' }}</div>
+      <div class="field-label">Mecánico</div>
+      <div class="field-value">{{ work_order.mechanic_name or '—' }}</div>
+    </td>
+  </tr>
+</table>
+
+<div class="section">
+  <div class="section-title">Datos del Cliente</div>
+  <table class="two-col">
+    <tr>
+      <td>
+        <div class="field-label">Nombre</div>
+        <div class="field-value">{{ client.full_name if client else '—' }}</div>
+        <div class="field-label">DNI</div>
+        <div class="field-value">{{ client.dni if client else '—' }}</div>
+      </td>
+      <td>
+        <div class="field-label">Teléfono</div>
+        <div class="field-value">{{ client.phone if client else '—' }}</div>
+        <div class="field-label">Email</div>
+        <div class="field-value">{{ client.email if client else '—' }}</div>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="section">
+  <div class="section-title">Vehículo</div>
+  {% if work_order.vehicle_id %}
+  <table class="data-table">
+    <tr>
+      <td style="width:50%"><strong>{{ vehicle.brand }} {{ vehicle.model }}</strong></td>
+      <td>Versión: {{ vehicle.version or '—' }}</td>
+    </tr>
+    <tr>
+      <td>Año: {{ vehicle.year }} | Color: {{ vehicle.color or '—' }}</td>
+      <td>Patente: {{ vehicle.plate or '—' }}</td>
+    </tr>
+    <tr>
+      <td>Km ingreso: {{ '{:,.0f}'.format(vehicle.mileage) if vehicle.mileage else '—' }}</td>
+      <td>Motor N°: {{ vehicle.engine_number or '—' }}</td>
+    </tr>
+  </table>
+  {% else %}
+  <table class="data-table">
+    <tr>
+      <td style="width:50%"><strong>{{ work_order.external_vehicle.brand }} {{ work_order.external_vehicle.model }}</strong></td>
+      <td>Año: {{ work_order.external_vehicle.year }}</td>
+    </tr>
+    <tr>
+      <td>Patente: {{ work_order.external_vehicle.plate or '—' }}</td>
+      <td>Km: {{ '{:,.0f}'.format(work_order.external_vehicle.mileage) if work_order.external_vehicle.mileage else '—' }}</td>
+    </tr>
+  </table>
+  {% endif %}
+</div>
+
+<div class="section">
+  <div class="section-title">Trabajo Solicitado</div>
+  <table class="data-table">
+    <tr>
+      <td style="width:25%"><strong>Tipo de trabajo:</strong></td>
+      <td>{{ work_order.work_type | replace('_', ' ') | capitalize }}</td>
+    </tr>
+    <tr>
+      <td><strong>Descripción:</strong></td>
+      <td>{{ work_order.description }}</td>
+    </tr>
+    {% if work_order.observations %}
+    <tr>
+      <td><strong>Observaciones:</strong></td>
+      <td>{{ work_order.observations }}</td>
+    </tr>
+    {% endif %}
+  </table>
+</div>
+
+{% if items %}
+<div class="section">
+  <div class="section-title">Detalle de Trabajos y Repuestos</div>
+  <table class="data-table">
+    <tr>
+      <th style="width:10%">Tipo</th>
+      <th>Descripción</th>
+      <th style="width:12%">Cód.</th>
+      <th style="text-align:center; width:8%">Cant.</th>
+      <th style="text-align:right; width:18%">Precio Unit.</th>
+      <th style="text-align:right; width:18%">Subtotal</th>
+    </tr>
+    {% for item in items %}
+    <tr>
+      <td>
+        {% if item.item_type == 'labor' %}<span class="badge badge-blue">MO</span>
+        {% elif item.item_type == 'part' %}<span class="badge badge-green">REP</span>
+        {% else %}<span class="badge badge-yellow">OTR</span>{% endif %}
+      </td>
+      <td>{{ item.description }}</td>
+      <td>{{ item.part_code or '—' }}</td>
+      <td style="text-align:center">{{ item.quantity }}</td>
+      <td style="text-align:right">$ {{ '{:,.0f}'.format(item.unit_price) }}</td>
+      <td style="text-align:right">$ {{ '{:,.0f}'.format(item.subtotal) }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endif %}
+
+<!-- Totales -->
+<div class="total-box no-break">
+  <table style="width:100%; border-collapse:collapse;">
+    <tr>
+      <td style="text-align:left; font-size:8.5pt; color:#374151;">
+        Mano de obra: $ {{ '{:,.0f}'.format(work_order.labor_cost) }}<br/>
+        Repuestos / materiales: $ {{ '{:,.0f}'.format(work_order.parts_cost) }}
+      </td>
+      <td style="text-align:right;">
+        <div class="total-label">TOTAL</div>
+        <div class="total-value">$ {{ '{:,.0f}'.format(work_order.total) }}</div>
+      </td>
+    </tr>
+  </table>
+  <div style="font-size:7pt; color:#6b7280; margin-top:4px;">Precios en ARS. No incluye IVA salvo indicación.</div>
+</div>
+
+<div class="highlight-box no-break" style="font-size:8pt;">
+  <strong>Autorización del cliente:</strong> Autorizo la ejecución de los trabajos descriptos por el monto indicado.
+  Los repuestos no utilizados serán devueltos junto con el vehículo.
+  El vehículo debe ser retirado dentro de las 48 hs de notificada su finalización.
+</div>
+
+<table class="signature-section no-break">
+  <tr>
+    <td>
+      <div class="signature-name">{{ client.full_name if client else '—' }}</div>
+      DNI: {{ client.dni if client else '—' }}<br/>Cliente — Autorización
+    </td>
+    <td></td>
+    <td>
+      <div class="signature-name">{{ work_order.mechanic_name or 'Taller DM Cars' }}</div>
+      Responsable Técnico
+    </td>
+  </tr>
+</table>
+{% endblock %}

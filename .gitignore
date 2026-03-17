@@ -1,0 +1,52 @@
+# Entorno
+.env
+.env.local
+.env.production
+
+# Certificados AFIP (NUNCA al repositorio)
+certs/
+*.crt
+*.key
+*.pem
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv/
+dist/
+build/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+dist/
+.next/
+out/
+coverage/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Sessions Dev Manager (contexto local)
+.claude/sessions/
+
+# Archivos temporales de PDF
+tmp/
+temp/

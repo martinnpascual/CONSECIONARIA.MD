@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}Boleto de Compraventa {{ sale.sale_number }}{% endblock %}
+
+{% block content %}
+<div class="doc-title-box">
+  <div class="doc-title">Boleto de Compraventa</div>
+  <div class="doc-subtitle">Contrato bilateral de compraventa de vehículo automotor</div>
+</div>
+
+<table style="width:100%; border-collapse:collapse; margin-bottom:14px;">
+  <tr>
+    <td style="width:50%">
+      <div class="doc-number-box">
+        <div class="doc-number-label">N° de Operación</div>
+        <div class="doc-number">{{ sale.sale_number }}</div>
+      </div>
+    </td>
+    <td style="text-align:right; vertical-align:top;">
+      <div class="field-label">Fecha</div>
+      <div class="field-value">{{ sale.sale_date }}</div>
+      <div class="field-label">Lugar</div>
+      <div class="field-value">{{ business.city or business.address or 'Buenos Aires' }}</div>
+    </td>
+  </tr>
+</table>
+
+<!-- Partes -->
+<div class="section">
+  <div class="section-title">Partes del Contrato</div>
+  <table class="data-table">
+    <tr>
+      <th style="width:20%">Rol</th>
+      <th style="width:35%">Vendedor</th>
+      <th style="width:45%">Comprador</th>
+    </tr>
+    <tr>
+      <td><strong>Nombre</strong></td>
+      <td>{{ business.legal_name or 'DM Cars' }}</td>
+      <td>{{ client.full_name }}</td>
+    </tr>
+    <tr>
+      <td><strong>CUIT / DNI</strong></td>
+      <td>CUIT: {{ business.cuit or '—' }}</td>
+      <td>DNI: {{ client.dni or '—' }}</td>
+    </tr>
+    <tr>
+      <td><strong>Domicilio</strong></td>
+      <td>{{ business.address or '—' }}</td>
+      <td>{{ client.address or '—' }}</td>
+    </tr>
+    <tr>
+      <td><strong>Tel / Email</strong></td>
+      <td>{{ business.phone or '—' }}</td>
+      <td>{{ client.phone or '—' }} / {{ client.email or '—' }}</td>
+    </tr>
+  </table>
+</div>
+
+<!-- Vehículo -->
+<div class="section">
+  <div class="section-title">Vehículo Objeto del Contrato</div>
+  <table class="data-table">
+    <tr>
+      <th style="width:40%">Campo</th>
+      <th>Dato</th>
+      <th style="width:40%">Campo</th>
+      <th>Dato</th>
+    </tr>
+    <tr>
+      <td>Marca</td><td>{{ vehicle.brand }}</td>
+      <td>Modelo</td><td>{{ vehicle.model }}</td>
+    </tr>
+    <tr>
+      <td>Versión</td><td>{{ vehicle.version or '—' }}</td>
+      <td>Año</td><td>{{ vehicle.year }}</td>
+    </tr>
+    <tr>
+      <td>Patente / Dominio</td><td>{{ vehicle.plate or 'A asignar' }}</td>
+      <td>Chasis N°</td><td>{{ vehicle.vin or '—' }}</td>
+    </tr>
+    <tr>
+      <td>Motor N°</td><td>{{ vehicle.engine_number or '—' }}</td>
+      <td>Color</td><td>{{ vehicle.color or '—' }}</td>
+    </tr>
+    <tr>
+      <td>Kilómetros</td>
+      <td>{{ '{:,.0f}'.format(vehicle.mileage) if vehicle.mileage else '0 (cero)' }}</td>
+      <td>Tipo</td><td>{{ vehicle.vehicle_type | capitalize }}</td>
+    </tr>
+  </table>
+</div>
+
+<!-- Precio y forma de pago -->
+<div class="section">
+  <div class="section-title">Precio y Forma de Pago</div>
+  <table class="data-table">
+    <tr>
+      <th>Concepto</th>
+      <th style="text-align:right; width:30%">Importe (ARS)</th>
+    </tr>
+    <tr>
+      <td>Precio de venta acordado</td>
+      <td style="text-align:right"><strong>$ {{ '{:,.0f}'.format(sale.final_price) }}</strong></td>
+    </tr>
+    {% for payment in payments %}
+    <tr>
+      <td>{{ payment.payment_type | replace('_',' ') | capitalize }} — {{ payment.payment_method | capitalize }}
+          {% if payment.reference %} (Ref: {{ payment.reference }}){% endif %}</td>
+      <td style="text-align:right">$ {{ '{:,.0f}'.format(payment.amount) }}</td>
+    </tr>
+    {% endfor %}
+    <tr>
+      <td><strong>Saldo pendiente</strong></td>
+      <td style="text-align:right">
+        <strong>$ {{ '{:,.0f}'.format(sale.balance_due or 0) }}</strong>
+      </td>
+    </tr>
+    {% if sale.trade_in %}
+    <tr>
+      <td>Vehículo entregado en parte de pago: {{ sale.trade_in.brand }} {{ sale.trade_in.model }} {{ sale.trade_in.year }}</td>
+      <td style="text-align:right">$ {{ '{:,.0f}'.format(sale.trade_in.offered_value) }}</td>
+    </tr>
+    {% endif %}
+  </table>
+</div>
+
+<!-- Cláusulas -->
+<div class="section no-break">
+  <div class="section-title">Cláusulas del Contrato</div>
+  <p style="font-size:8pt; line-height:1.6; text-align:justify;">
+  <strong>PRIMERA — OBJETO:</strong> El Vendedor vende y transfiere al Comprador el vehículo descripto en el presente, libre de todo gravamen, inhibición y/o restricción de dominio.<br/>
+  <strong>SEGUNDA — PRECIO:</strong> El precio total de la operación es el indicado en la tabla precedente, que las partes declaran justo y convenido.<br/>
+  <strong>TERCERA — ENTREGA:</strong> El Vendedor hará entrega del vehículo una vez cancelado el precio total acordado, o según las condiciones pactadas en el presente instrumento.<br/>
+  <strong>CUARTA — TRANSFERENCIA:</strong> La transferencia registral se realizará dentro de los plazos legales vigentes. Los gastos de transferencia corren por cuenta del Comprador salvo pacto en contrario.<br/>
+  <strong>QUINTA — GARANTÍA:</strong> El Vendedor garantiza que el vehículo no registra deudas de patentes, infracciones ni prendas al momento de la firma, o en caso contrario lo informa expresamente.<br/>
+  <strong>SEXTA — CONFORMIDAD:</strong> El Comprador declara haber inspeccionado el vehículo y recibirlo conforme al estado descripto en el presente.<br/>
+  <strong>SÉPTIMA — JURISDICCIÓN:</strong> Para dirimir cualquier controversia derivada del presente, las partes se someten a los Tribunales Ordinarios de la Ciudad Autónoma de Buenos Aires.
+  </p>
+</div>
+
+{% if sale.notes %}
+<div class="highlight-box no-break">
+  <strong>Observaciones adicionales:</strong> {{ sale.notes }}
+</div>
+{% endif %}
+
+<!-- Firmas -->
+<table class="signature-section no-break">
+  <tr>
+    <td>
+      <div class="signature-name">{{ client.full_name }}</div>
+      DNI: {{ client.dni or '—' }}<br/>Comprador
+    </td>
+    <td>
+      <div class="signature-name">Testigo</div>
+      DNI: _______________
+    </td>
+    <td>
+      <div class="signature-name">{{ business.legal_name or 'DM Cars' }}</div>
+      CUIT: {{ business.cuit or '—' }}<br/>Vendedor
+    </td>
+  </tr>
+</table>
+{% endblock %}
