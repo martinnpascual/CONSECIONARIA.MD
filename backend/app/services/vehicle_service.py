@@ -4,7 +4,7 @@ services/vehicle_service.py — Lógica de negocio para el módulo de Stock
 Toda la lógica de negocio va acá. Los routers solo delegan a este servicio.
 """
 import math
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 from typing import Optional
 from uuid import UUID
@@ -363,9 +363,7 @@ class VehicleService:
     # ──────────────────────────────────────────
     async def get_stale_vehicles(self, days_threshold: int = 90) -> list[dict]:
         """Retorna vehículos con más de N días en stock sin vender."""
-        threshold_date = date.today().replace(
-            day=date.today().day - days_threshold
-        )
+        threshold_date = date.today() - timedelta(days=days_threshold)
         response = self.db.table("vehicles").select(
             "id, brand, model, version, year, entry_date, list_price, status"
         ).in_("status", ["disponible", "reservado"]).lte(

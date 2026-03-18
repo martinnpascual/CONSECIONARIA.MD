@@ -12,7 +12,7 @@ from pydantic import BaseModel
 from typing import Optional
 import io
 
-from app.supabase_client import get_db_client
+from app.supabase_client import get_supabase_admin as get_db_client
 from app.utils.security import get_current_user
 from app.services.pdf_service import PDFService, TEMPLATE_MAP
 
