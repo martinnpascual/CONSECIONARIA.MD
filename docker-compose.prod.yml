@@ -52,9 +52,8 @@ services:
     container_name: dmcars-frontend
     ports:
       - "80:80"
-    depends_on:
-      backend:
-        condition: service_healthy
+   depends_on:
+      - backend
     networks:
       - dmcars-network
     restart: unless-stopped
