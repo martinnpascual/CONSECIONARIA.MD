@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { MainLayout } from '@/components/layout/MainLayout'
 import { LoginPage } from '@/pages/LoginPage'
 import { useAuthStore } from '@/store/authStore'
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary'
 
 // ── Lazy imports (split por módulo) ──────────────────────────────
 import { lazy, Suspense } from 'react'
@@ -42,81 +43,101 @@ export function App() {
         <Route
           path="/dashboard"
           element={
-            <Suspense fallback={<PageFallback />}>
-              <DashboardPage />
-            </Suspense>
+            <ErrorBoundary moduleName="Dashboard">
+              <Suspense fallback={<PageFallback />}>
+                <DashboardPage />
+              </Suspense>
+            </ErrorBoundary>
           }
         />
         <Route
           path="/stock/*"
           element={
-            <Suspense fallback={<PageFallback />}>
-              <StockPage />
-            </Suspense>
+            <ErrorBoundary moduleName="Stock">
+              <Suspense fallback={<PageFallback />}>
+                <StockPage />
+              </Suspense>
+            </ErrorBoundary>
           }
         />
         <Route
           path="/crm/*"
           element={
-            <Suspense fallback={<PageFallback />}>
-              <CRMPage />
-            </Suspense>
+            <ErrorBoundary moduleName="CRM">
+              <Suspense fallback={<PageFallback />}>
+                <CRMPage />
+              </Suspense>
+            </ErrorBoundary>
           }
         />
         <Route
           path="/ventas/*"
           element={
-            <Suspense fallback={<PageFallback />}>
-              <VentasPage />
-            </Suspense>
+            <ErrorBoundary moduleName="Ventas">
+              <Suspense fallback={<PageFallback />}>
+                <VentasPage />
+              </Suspense>
+            </ErrorBoundary>
           }
         />
         <Route
           path="/taller/*"
           element={
-            <Suspense fallback={<PageFallback />}>
-              <TallerPage />
-            </Suspense>
+            <ErrorBoundary moduleName="Taller">
+              <Suspense fallback={<PageFallback />}>
+                <TallerPage />
+              </Suspense>
+            </ErrorBoundary>
           }
         />
         <Route
           path="/caja/*"
           element={
-            <Suspense fallback={<PageFallback />}>
-              <CajaPage />
-            </Suspense>
+            <ErrorBoundary moduleName="Caja">
+              <Suspense fallback={<PageFallback />}>
+                <CajaPage />
+              </Suspense>
+            </ErrorBoundary>
           }
         />
         <Route
           path="/consignaciones/*"
           element={
-            <Suspense fallback={<PageFallback />}>
-              <ConsignPage />
-            </Suspense>
+            <ErrorBoundary moduleName="Consignaciones">
+              <Suspense fallback={<PageFallback />}>
+                <ConsignPage />
+              </Suspense>
+            </ErrorBoundary>
           }
         />
         <Route
           path="/documentos/*"
           element={
-            <Suspense fallback={<PageFallback />}>
-              <DocumentosPage />
-            </Suspense>
+            <ErrorBoundary moduleName="Documentos">
+              <Suspense fallback={<PageFallback />}>
+                <DocumentosPage />
+              </Suspense>
+            </ErrorBoundary>
           }
         />
         <Route
           path="/usados/*"
           element={
-            <Suspense fallback={<PageFallback />}>
-              <UsadosPage />
-            </Suspense>
+            <ErrorBoundary moduleName="Toma de Usados">
+              <Suspense fallback={<PageFallback />}>
+                <UsadosPage />
+              </Suspense>
+            </ErrorBoundary>
           }
         />
         <Route
           path="/configuracion/*"
           element={
-            <Suspense fallback={<PageFallback />}>
-              <ConfigPage />
-            </Suspense>
+            <ErrorBoundary moduleName="Configuración">
+              <Suspense fallback={<PageFallback />}>
+                <ConfigPage />
+              </Suspense>
+            </ErrorBoundary>
           }
         />
       </Route>
