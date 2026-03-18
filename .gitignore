@@ -44,8 +44,14 @@ Thumbs.db
 *.log
 logs/
 
-# Sessions Dev Manager (contexto local)
+# Sessions y worktrees de Claude Code (contexto local)
 .claude/sessions/
+.claude/worktrees/
+*.claudelaunch.json
+
+# Repos embebidos (gestionar como submodules si se necesitan)
+mission-control/
+CONSECIONARIA.MD/
 
 # Archivos temporales de PDF
 tmp/
