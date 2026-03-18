@@ -50,8 +50,8 @@ services:
         VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
         VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY}
     container_name: dmcars-frontend
-    ports:
-      - "80:80"
+    expose:
+      - "80"
     depends_on:
       - backend
     networks:
@@ -61,3 +61,4 @@ services:
 networks:
   dmcars-network:
     driver: bridge
+   
