@@ -125,7 +125,7 @@ export function LeadFormModal({ lead, defaultPersonId, open, onClose }: LeadForm
                   dni:        form.dni.trim()   || undefined,
                 },
               }),
-        })
+        } as Partial<Lead>)
         toast.success('Lead creado')
       }
       onClose()

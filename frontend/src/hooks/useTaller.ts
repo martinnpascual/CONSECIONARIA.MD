@@ -43,7 +43,7 @@ export function useTallerFilters() {
       setSearchInput(value as string)
       debouncedSearch(value as string)
     } else {
-      setFilters(f => ({ ...f, [key]: value, page: key !== 'page' ? 1 : value }))
+      setFilters(f => ({ ...f, [key]: value, page: key !== 'page' ? 1 : (value as number) }))
     }
   }
 

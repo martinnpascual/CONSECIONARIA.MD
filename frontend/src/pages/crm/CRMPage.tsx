@@ -20,7 +20,7 @@ import type { Lead } from '@/types'
 function KanbanView() {
   const [search,  setSearch]  = useState('')
   const [dSearch, setDSearch] = useState('')
-  const { data: board, isLoading } = useLeadKanban({ search: dSearch })
+  const { data: board, isLoading } = useLeadKanban({ search: dSearch, assigned_to: '' })
   const moveLead = useMoveLead()
   const [newLeadOpen, setNewLeadOpen] = useState(false)
   const [editingLead, setEditingLead] = useState<Lead | null>(null)

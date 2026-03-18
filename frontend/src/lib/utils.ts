@@ -37,10 +37,10 @@ export function truncate(str: string, n: number): string {
 }
 
 /** Debounce genérico */
-export function debounce<T extends (...args: unknown[]) => unknown>(
-  fn: T,
+export function debounce<Args extends unknown[]>(
+  fn: (...args: Args) => void,
   delay: number
-): (...args: Parameters<T>) => void {
+): (...args: Args) => void {
   let timer: ReturnType<typeof setTimeout>
   return (...args) => {
     clearTimeout(timer)
