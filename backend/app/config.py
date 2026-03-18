@@ -23,7 +23,7 @@ class Settings(BaseSettings):
 
     # ── Supabase ─────────────────────────────────
     supabase_url: str
-    supabase_anon_key: str
+    supabase_anon_key: str = ""   # El backend usa service_role; anon solo en frontend
     supabase_service_role_key: str
     jwt_secret: str
     jwt_algorithm: str = "HS256"

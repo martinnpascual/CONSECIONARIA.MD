@@ -49,7 +49,11 @@ app.add_middleware(
 if settings.is_production:
     app.add_middleware(
         TrustedHostMiddleware,
-        allowed_hosts=["dmcars.com.ar", "*.dmcars.com.ar", "localhost"],
+        allowed_hosts=[
+            "dmcars.com.ar", "*.dmcars.com.ar",
+            "copitohelados.online", "*.copitohelados.online",
+            "localhost",
+        ],
     )
 
 # ──────────────────────────────────────────────
