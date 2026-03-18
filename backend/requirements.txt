@@ -10,7 +10,7 @@ python-dotenv==1.0.1
 
 # ── Supabase ──────────────────────────────────
 supabase==2.4.0
-gotrue==2.4.0
+gotrue==2.4.1
 
 # ── Auth / JWT ────────────────────────────────
 python-jose[cryptography]==3.3.0
