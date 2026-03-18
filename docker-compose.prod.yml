@@ -9,8 +9,7 @@ version: '3.8'
 
 services:
 
-  # ── Backend FastAPI ──────────────────────────────────────
- backend:
+  backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -28,10 +27,9 @@ services:
       AFIP_TESTING: ${AFIP_TESTING:-true}
       FRONTEND_URL: ${FRONTEND_URL}
     volumes:
-      # Certificados ARCA (montar desde servidor, nunca en imagen)
       - ./certs:/app/app/certs:ro
     expose:
-      - "8000"           # Solo visible internamente (nginx hace proxy)
+      - "8000"
     networks:
       - dmcars-network
     restart: unless-stopped
@@ -42,14 +40,13 @@ services:
       retries: 3
       start_period: 10s
 
-  # ── Frontend React (nginx) ───────────────────────────────
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      target: production          # Stage de producción (nginx)
+      target: production
       args:
-        VITE_API_URL: /api/v1     # Relativo — nginx hace proxy a backend
+        VITE_API_URL: /api/v1
         VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
         VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY}
     container_name: dmcars-frontend
