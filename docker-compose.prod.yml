@@ -10,16 +10,23 @@ version: '3.8'
 services:
 
   # ── Backend FastAPI ──────────────────────────────────────
-  backend:
+ backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: dmcars-backend
-    env_file:
-      - .env
     environment:
       APP_ENV: production
       DEBUG: "false"
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      JWT_SECRET: ${JWT_SECRET}
+      MRBOT_EMAIL: ${MRBOT_EMAIL:-}
+      MRBOT_API_KEY: ${MRBOT_API_KEY:-}
+      AFIP_CUIT: ${AFIP_CUIT:-}
+      AFIP_PUNTO_VENTA: ${AFIP_PUNTO_VENTA:-1}
+      AFIP_TESTING: ${AFIP_TESTING:-true}
+      FRONTEND_URL: ${FRONTEND_URL}
     volumes:
       # Certificados ARCA (montar desde servidor, nunca en imagen)
       - ./certs:/app/app/certs:ro
