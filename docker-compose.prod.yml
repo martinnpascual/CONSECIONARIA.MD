@@ -52,7 +52,7 @@ services:
     container_name: dmcars-frontend
     ports:
       - "80:80"
-   depends_on:
+    depends_on:
       - backend
     networks:
       - dmcars-network
