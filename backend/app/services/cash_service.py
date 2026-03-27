@@ -287,19 +287,20 @@ class CashService:
         items = [await self._enrich_movement(r) for r in (response.data or [])]
 
         return PaginatedMovements(
-            data=items,
+            items=items,
             total=total,
             page=filters.page,
             per_page=filters.per_page,
-            total_pages=math.ceil(total / filters.per_page) if total > 0 else 1,
+            pages=math.ceil(total / filters.per_page) if total > 0 else 1,
         )
 
     async def _enrich_movement(self, row: dict) -> CashMovementOut:
         person_name = None
         if row.get("person_id"):
-            r = self.db.table("persons").select("full_name").eq("id", row["person_id"]).execute()
+            r = self.db.table("persons").select("first_name, last_name").eq("id", row["person_id"]).execute()
             if r.data:
-                person_name = r.data[0]["full_name"]
+                p = r.data[0]
+                person_name = f"{p.get('first_name', '')} {p.get('last_name', '')}".strip()
 
         registered_by_name = None
         if row.get("registered_by"):

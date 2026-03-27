@@ -41,7 +41,7 @@ export function SaleFormModal({ isOpen, onClose }: Props) {
 
   const { data: clients } = useQuery({
     queryKey: ['persons-search', clientSearch],
-    queryFn: () => apiGet<{ data: { id: string; full_name: string; dni?: string }[] }>(`/persons?search=${clientSearch}&per_page=8`),
+    queryFn: () => apiGet<{ items: { id: string; full_name: string; dni_cuit?: string }[] }>(`/persons?search=${clientSearch}&per_page=8`),
     enabled: clientSearch.length >= 2,
   })
 
@@ -51,7 +51,7 @@ export function SaleFormModal({ isOpen, onClose }: Props) {
     enabled: vehicleSearch.length >= 1,
   })
 
-  const selectedVehicle = vehicles?.data?.find((v) => v.id === vehicleId)
+  const selectedVehicle = vehicles?.items?.find((v) => v.id === vehicleId)
   const needsFinancing = opType === 'financiado' || opType === 'combinado'
 
   async function handleSubmit(e: React.FormEvent) {
@@ -102,14 +102,14 @@ export function SaleFormModal({ isOpen, onClose }: Props) {
             value={clientSearch}
             onChange={(e) => { setClientSearch(e.target.value); setClientId('') }}
           />
-          {clients?.data && clients.data.length > 0 && !clientId && (
+          {clients?.items && clients.items.length > 0 && !clientId && (
             <ul className="mt-1 border border-gray-200 dark:border-gray-700 rounded-lg divide-y divide-gray-100 dark:divide-gray-700 text-sm max-h-36 overflow-y-auto">
-              {clients.data.map((p) => (
+              {clients.items.map((p) => (
                 <li key={p.id}
                   className="px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
                   onClick={() => { setClientId(p.id); setClientSearch(p.full_name) }}
                 >
-                  {p.full_name} {p.dni && <span className="text-gray-400 ml-1">— {p.dni}</span>}
+                  {p.full_name} {p.dni_cuit && <span className="text-gray-400 ml-1">— {p.dni_cuit}</span>}
                 </li>
               ))}
             </ul>
@@ -124,9 +124,9 @@ export function SaleFormModal({ isOpen, onClose }: Props) {
             value={vehicleSearch}
             onChange={(e) => { setVehicleSearch(e.target.value); setVehicleId('') }}
           />
-          {vehicles?.data && vehicles.data.length > 0 && !vehicleId && (
+          {vehicles?.items && vehicles.items.length > 0 && !vehicleId && (
             <ul className="mt-1 border border-gray-200 dark:border-gray-700 rounded-lg divide-y divide-gray-100 dark:divide-gray-700 text-sm max-h-36 overflow-y-auto">
-              {vehicles.data.map((v) => (
+              {vehicles.items.map((v) => (
                 <li key={v.id}
                   className="px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
                   onClick={() => {

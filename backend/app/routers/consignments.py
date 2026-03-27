@@ -51,16 +51,23 @@ async def list_consignments(
 ):
     """Lista consignaciones con filtros y paginación."""
     from datetime import date as date_type
-    filters = ConsignmentFilters(
-        search=search,
-        status=status_filter,
-        settlement_paid=settlement_paid,
-        date_from=date_type.fromisoformat(date_from) if date_from else None,
-        date_to=date_type.fromisoformat(date_to) if date_to else None,
-        page=page,
-        per_page=per_page,
-    )
-    return await service.list_consignments(filters)
+    from fastapi import HTTPException
+    import traceback
+    try:
+        filters = ConsignmentFilters(
+            search=search,
+            status=status_filter,
+            settlement_paid=settlement_paid,
+            date_from=date_type.fromisoformat(date_from) if date_from else None,
+            date_to=date_type.fromisoformat(date_to) if date_to else None,
+            page=page,
+            per_page=per_page,
+        )
+        return await service.list_consignments(filters)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error consignments: {str(e)} | {traceback.format_exc()[-600:]}")
 
 
 # ──────────────────────────────────────────────

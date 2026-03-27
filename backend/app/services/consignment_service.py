@@ -70,19 +70,20 @@ class ConsignmentService:
             total = len(items)
 
         return PaginatedConsignments(
-            data=items,
+            items=items,
             total=total,
             page=filters.page,
             per_page=filters.per_page,
-            total_pages=math.ceil(total / filters.per_page) if total > 0 else 1,
+            pages=math.ceil(total / filters.per_page) if total > 0 else 1,
         )
 
     async def _enrich_list_item(self, row: dict) -> ConsignmentListItem:
         owner_name = None
         if row.get("owner_id"):
-            r = self.db.table("persons").select("full_name").eq("id", row["owner_id"]).execute()
+            r = self.db.table("persons").select("first_name, last_name").eq("id", row["owner_id"]).execute()
             if r.data:
-                owner_name = r.data[0]["full_name"]
+                p = r.data[0]
+                owner_name = f"{p.get('first_name', '')} {p.get('last_name', '')}".strip()
 
         vehicle_info = None
         if row.get("vehicle_id"):

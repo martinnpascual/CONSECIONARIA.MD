@@ -79,20 +79,21 @@ class WorkOrderService:
             total = len(items)
 
         return PaginatedWorkOrders(
-            data=items,
+            items=items,
             total=total,
             page=filters.page,
             per_page=filters.per_page,
-            total_pages=math.ceil(total / filters.per_page) if total > 0 else 1,
+            pages=math.ceil(total / filters.per_page) if total > 0 else 1,
         )
 
     async def _enrich_list_item(self, row: dict) -> WorkOrderListItem:
         """Enriquece una fila de OT con nombres de cliente y mecánico."""
         client_name = None
         if row.get("client_id"):
-            r = self.db.table("persons").select("full_name").eq("id", row["client_id"]).execute()
+            r = self.db.table("persons").select("first_name, last_name").eq("id", row["client_id"]).execute()
             if r.data:
-                client_name = r.data[0]["full_name"]
+                p = r.data[0]
+                client_name = f"{p.get('first_name', '')} {p.get('last_name', '')}".strip()
 
         mechanic_name = None
         if row.get("mechanic_id"):
@@ -160,9 +161,10 @@ class WorkOrderService:
         # Enriquecer
         client_name = None
         if row.get("client_id"):
-            r = self.db.table("persons").select("full_name").eq("id", row["client_id"]).execute()
+            r = self.db.table("persons").select("first_name, last_name").eq("id", row["client_id"]).execute()
             if r.data:
-                client_name = r.data[0]["full_name"]
+                p = r.data[0]
+                client_name = f"{p.get('first_name', '')} {p.get('last_name', '')}".strip()
 
         mechanic_name = None
         if row.get("mechanic_id"):

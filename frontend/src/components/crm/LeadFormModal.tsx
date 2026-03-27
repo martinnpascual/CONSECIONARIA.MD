@@ -44,16 +44,16 @@ const EMPTY: FormData = {
   dni: '',
 }
 
+// Valores válidos en el backend (origin_channel enum)
 const SOURCE_OPTIONS = [
-  { value: '',            label: 'Fuente (opcional)' },
-  { value: 'web',         label: 'Web' },
-  { value: 'instagram',   label: 'Instagram' },
-  { value: 'facebook',    label: 'Facebook' },
-  { value: 'whatsapp',    label: 'WhatsApp' },
-  { value: 'referido',    label: 'Referido' },
-  { value: 'visita',      label: 'Visita directa' },
-  { value: 'llamada',     label: 'Llamada' },
-  { value: 'mercadolibre',label: 'MercadoLibre' },
+  { value: '',             label: 'Fuente (opcional)' },
+  { value: 'web',          label: 'Web' },
+  { value: 'instagram',    label: 'Instagram' },
+  { value: 'facebook',     label: 'Facebook' },
+  { value: 'mercadolibre', label: 'MercadoLibre' },
+  { value: 'showroom',     label: 'Showroom' },
+  { value: 'referido',     label: 'Referido' },
+  { value: 'otro',         label: 'Otro' },
 ]
 
 export function LeadFormModal({ lead, defaultPersonId, open, onClose }: LeadFormModalProps) {
@@ -94,38 +94,29 @@ export function LeadFormModal({ lead, defaultPersonId, open, onClose }: LeadForm
 
     try {
       if (isEditing) {
+        // Backend espera PersonUpdate: lead_status, origin_channel (no status/source)
         await update.mutateAsync({
-          id:     lead!.id,
-          status: form.status as Lead['status'],
-          source: form.source || undefined,
-          interested_description: form.interested_description || undefined,
-          budget_min: form.budget_min ? Number(form.budget_min) : undefined,
-          budget_max: form.budget_max ? Number(form.budget_max) : undefined,
+          id:               lead!.id,
+          lead_status:      form.status as Lead['status'],
+          origin_channel:   form.source || undefined,
           next_contact_date: form.next_contact_date || undefined,
-          notes: form.notes || undefined,
-        })
+          notes:            form.notes || undefined,
+        } as any)
         toast.success('Lead actualizado')
       } else {
+        // Backend espera PersonCreate: campos planos first_name, last_name, lead_status, origin_channel
         await create.mutateAsync({
-          status: form.status as Lead['status'],
-          source: form.source || undefined,
-          interested_description: form.interested_description || undefined,
-          budget_min: form.budget_min ? Number(form.budget_min) : undefined,
-          budget_max: form.budget_max ? Number(form.budget_max) : undefined,
+          first_name:     form.first_name.trim(),
+          last_name:      form.last_name.trim() || '-',
+          phone:          form.phone.trim() || undefined,
+          email:          form.email.trim() || undefined,
+          dni_cuit:       form.dni.trim()   || undefined,
+          lead_status:    form.status,
+          origin_channel: form.source || 'showroom',
+          person_type:    'lead',
+          notes:          form.notes || undefined,
           next_contact_date: form.next_contact_date || undefined,
-          notes: form.notes || undefined,
-          ...(defaultPersonId
-            ? { person_id: defaultPersonId }
-            : {
-                person: {
-                  first_name: form.first_name.trim(),
-                  last_name:  form.last_name.trim(),
-                  phone:      form.phone.trim() || undefined,
-                  email:      form.email.trim() || undefined,
-                  dni:        form.dni.trim()   || undefined,
-                },
-              }),
-        } as Partial<Lead>)
+        } as any)
         toast.success('Lead creado')
       }
       onClose()
